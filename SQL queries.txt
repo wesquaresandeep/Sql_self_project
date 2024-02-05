@@ -1,0 +1,139 @@
+﻿1) Question:How many unique or distinct items were ordered?
+   Query:SELECT count(distinct name) FROM `quantum-theme-344315.projectsql.items` LIMIT 1000
+
+
+
+2) Question: What is the distribution of veg and non veg items?
+  Query: SELECT is_veg,count(name) as items FROM `quantum-theme-344315.projectsql.items` 
+  group by is_veg
+
+
+
+3)Question: List of one anamoly in the table which is neither veg or non veg?
+  Query: SELECT * FROM `quantum-theme-344315.projectsql.items` 
+  where is_veg=2
+
+
+
+4)Question:Select the items consisting of chicken food?
+  Query: SELECT * FROM `quantum-theme-344315.projectsql.items`
+  where name like '%Chicken%'
+
+
+
+5)Question: Select the items consisting of Parantha food?
+  Query : SELECT * FROM `quantum-theme-344315.projectsql.items`
+  where name like '%Paratha%'
+
+
+
+6)Question:What is the average number of items per order? 
+  Query:SELECT count(name)/count(distinct order_id) as avgitemsperorder FROM `quantum-    theme-344315.projectsql.items`
+
+
+
+7)Question:How many times each item was ordered?
+  Query:SELECT name,count(*) FROM `quantum-theme-344315.projectsql.items`
+  group by name
+  order by count(*) desc
+
+
+
+8)Question:What are the different values of rain modes?
+  Query:SELECT distinct rain_mode FROM `quantum-theme-344315.projectsql.orders` LIMIT 1000
+
+
+
+
+
+
+9)Question:Number of restaurants that we have ordered the most?
+Query:SELECT count(distinct restaurant_name) FROM `quantum-theme-344315.projectsql.orders` LIMIT 1000
+SELECT restaurant_name,count(*) FROM `quantum-theme-344315.projectsql.orders` 
+group by restaurant_name
+order by count(*) desc
+
+
+
+
+
+10)Question:Number of distinct orders in each month??
+Query: SELECT format_date('%Y-%m',order_time),count(distinct order_id) FROM `quantum-theme-344315.projectsql.orders` 
+group by  format_date('%Y-%m',order_time)
+order by count(distinct order_id) desc
+
+
+
+
+
+11)Question:What is the frequency of the customer ordering the items?
+Query:SELECT max(order_time) FROM `quantum-theme-344315.projectsql.orders` 
+
+
+
+12)Question:What was the revenue made by swiggy in each month?
+Query:SELECT format_date('%Y-%m',order_time),sum(order_total) as totalrevenue 
+FROM `quantum-theme-344315.projectsql.orders` 
+group by format_date('%Y-%m',order_time)
+order by totalrevenue desc
+
+
+
+13)Question:On average per order how much does a customer spend??
+Query:SELECT sum(order_total)/count(distinct order_id) as aov
+FROM `quantum-theme-344315.projectsql.orders` 
+
+
+14)Question:Calculation on the amount spent on swiggy every year?
+Query: SELECT format_date('%Y',order_time),sum(order_total) as revenue
+FROM `quantum-theme-344315.projectsql.orders` 
+group by  format_date('%Y',order_time)
+
+
+
+
+15)Question:Calculate the year on year change in the revenue in swiggy?
+Query: with final as (
+SELECT format_date('%Y',order_time) as yearorder,sum(order_total) as revenue
+FROM `quantum-theme-344315.projectsql.orders` 
+group by  format_date('%Y',order_time))
+select yearorder,revenue,lag(revenue) over (order by yearorder) as previousrevenue from
+final
+
+
+
+
+
+16)Question:Calculate the ranks of the year based on the revenue?
+Query:with final as (SELECT format_date('%Y',order_time) as yearorder,sum(order_total) as revenue
+FROM `quantum-theme-344315.projectsql.orders` 
+group by  format_date('%Y',order_time))
+select yearorder,revenue,
+rank() over (order by revenue desc) as ranking from final
+
+
+
+
+17)Question:Calculate the ranks of the restaurants based on the revenue?
+Query:with final as (
+SELECT restaurant_name,sum(order_total) as revenue
+FROM `quantum-theme-344315.projectsql.orders` 
+group by  restaurant_name)
+select restaurant_name,revenue,
+rank() over (order by revenue desc) as ranking from final
+order by revenue desc
+
+
+
+18)Question:What were the items ordered in each order?
+Query:SELECT a.name,a.is_veg,b.restaurant_name,b.order_id,b.order_time FROM `quantum-theme-344315.projectsql.items` a
+join `quantum-theme-344315.projectsql.orders`  b
+on a.order_id=b.order_id
+
+
+19)Question:Get the list of the combination products ordered together?
+Query:SELECT a.order_id,a.name,b.name as name2,concat(a.name,"-",b.name) FROM `quantum-theme-344315.projectsql.items` a
+join `quantum-theme-344315.projectsql.items` b
+on a.order_id=b.order_id
+where a.name!=b.name
+and a.name<b.name
